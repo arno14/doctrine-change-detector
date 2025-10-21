@@ -1,0 +1,1 @@
+{"version":2,"defects":{"ChangeDetectorListenerTest::testExample":8,"ChangeDetectorListenerTest::testSecondFlushDoesNotTriggerQueries":7},"times":{"ChangeDetectorListenerTest::testExample":0.008,"ChangeDetectorListenerTest::testSecondFlushDoesNotTriggerQueries":0.011}}

@@ -1,0 +1,22 @@
+{
+    "name": "arno14/doctrine_change_detector",
+    "description": "Review the detection of change on doctrine Entity using their database values",
+    "type": "library",
+    "require": {
+        "doctrine/orm": "^3.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.4",
+        "symfony/cache": "^7.3",
+        "php-cs-fixer/shim": "^3.89"
+    },
+    "autoload": {
+        "psr-4": {
+            "Arno14\\DoctrineChangeDetector\\": "src/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit test",
+        "fix": "vendor/bin/php-cs-fixer fix src"
+    }
+}
