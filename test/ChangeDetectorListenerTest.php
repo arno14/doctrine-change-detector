@@ -25,7 +25,7 @@ class ChangeDetectorListenerTest extends AbstractTestCase
         $entity->birthDay = new \DateTime('2000-01-01');
         $this->entityManager->flush();
         $this->assertCountQueries(1);
-        //change this, we expect zero queries as the value is the same
+        //@todo change this, we expect zero queries as the value is the same
 
         // Clear and reload entity
         $this->resetCountQueries();

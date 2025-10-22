@@ -34,6 +34,7 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
         $meta = $em->getClassMetadata(get_class($entity));
 
 
+        //@todo avoid iterating on each entity, as metadata are the sames for a given class
         foreach ($meta->fieldMappings as $name => $field) {
 
             $useDbValue = $field->options['detectChangeByDatabaseValue'] ?? false;
@@ -115,9 +116,7 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
     public function postFlush(PostFlushEventArgs $args): void
     {
         $this->originalValues = [];
-        // After flush, retrieve the newly affected original values
-
-        // $args->
+        // @todo After flush, retrieve the newly affected original values
     }
 
     public function onClear(): void
