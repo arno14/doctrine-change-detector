@@ -4,6 +4,7 @@ namespace Arno14\DoctrineChangeDetector;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PostLoadEventArgs;
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use Doctrine\ORM\Events;
@@ -27,7 +28,6 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
 
     public function postLoad(PostLoadEventArgs $args): void
     {
-        print_r(__METHOD__."\n");
         $entity = $args->getObject();
         /** @var EntityManager $em */
         $em = $args->getObjectManager();
@@ -57,27 +57,17 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
                 'php' => $originalPHPValue,
                 'db'  => $originalDBValue,
             ];
-
-            // print_r(__METHOD__." for field $name : useDbValue=".($useDbValue?'true':'false')."\n");
-            // $value = $meta->getFieldValue($entity, $field);
-            // $meta->setFieldValue($entity, $field, $value);
         }
-
-        print_r(__METHOD__." stored original values: ".json_encode($this->originalValues)."\n");
     }
 
     public function preFlush(PreFlushEventArgs $args): void
     {
-        print_r(__METHOD__."\n".json_encode($this->originalValues));
-
         /** @var EntityManager $em */
         $em = $args->getObjectManager();
 
         foreach ($em->getUnitOfWork()->getIdentityMap() as $class => $entities) {
 
             foreach ($entities as $entity) {
-
-                print_r($entity);
 
                 $oid = spl_object_id($entity);
 
@@ -86,7 +76,6 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
                 }
 
                 foreach ($this->originalValues[$oid] as $fieldName => $originalValues) {
-                    print_r($originalValues);
 
                     $meta = $em->getClassMetadata(get_class($entity));
                     $type = Type::getType($meta->fieldMappings[$fieldName]->type);
@@ -107,8 +96,8 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
 
                     if ($originalPHPValue === $currentPHPValue) {
 
-                        //DB values are different but PHP values are the same
-                        // force update by recreating an instance of the PHP value
+                        // DB values are different but PHP values are the same
+                        // force update by recreating a new instance of the PHP value
                         $recreatedPHPValue = $type->convertToPHPValue(
                             $currentDBValue,
                             $em->getConnection()->getDatabasePlatform()
@@ -119,15 +108,16 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
 
                 }
                 unset($this->originalValues[$oid]);
-
             }
         }
     }
 
-    public function postFlush(): void
+    public function postFlush(PostFlushEventArgs $args): void
     {
-        //After flush, retrieve the newly affected original values
-        // $this->originalValues = [];
+        $this->originalValues = [];
+        // After flush, retrieve the newly affected original values
+
+        // $args->
     }
 
     public function onClear(): void
