@@ -6,7 +6,10 @@ namespace Arno14\DoctrineChangeDetector\Tests;
 
 use Arno14\DoctrineChangeDetector\Tests\Entity\TestEntity;
 
-class NoBCwithCurrentBehaviorTest extends AbstractTestCase
+/**
+ * Test that fields without 'detectChangeByDatabaseValue' option behave as usual
+ */
+class NoBreakingChangewithCurrentBehaviorTest extends AbstractTestCase
 {
     public function testNoChangeOnMappedFieldWithoutOption(): void
     {
@@ -25,7 +28,7 @@ class NoBCwithCurrentBehaviorTest extends AbstractTestCase
         // Update with same value
         $entity->dateByRef = new \DateTime('2000-01-01');
         $this->entityManager->flush();
-        $this->assertCountQueries(1)
+        $this->assertCountQueries(1)// this trigger SQL query but this one is unusefull
             ->assertDBValue('2000-01-01', $entity->id, 'date_by_ref')
             ->resetCountQueries();
 
@@ -48,6 +51,13 @@ class NoBCwithCurrentBehaviorTest extends AbstractTestCase
         $this->entityManager->flush();
         $this->assertCountQueries(1)
             ->assertDBValue('2020-01-01', $entity->id, 'date_by_ref')
+            ->resetCountQueries();
+
+        // Modify the DateTime object without changing its value, which is not supported by Doctrine ORM currently
+        $entity->dateByRef->modify('+1 day');
+        $this->entityManager->flush();
+        $this->assertCountQueries(0)
+            ->assertDBValue('2020-01-01', $entity->id, 'date_by_ref')//DB value is unchanged
             ->resetCountQueries();
     }
 }

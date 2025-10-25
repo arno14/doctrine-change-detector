@@ -22,6 +22,7 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
         return [
             Events::postLoad,
             Events::preFlush,
+            Events::postFlush,
             Events::onClear
         ];
     }
@@ -116,7 +117,41 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
     public function postFlush(PostFlushEventArgs $args): void
     {
         $this->originalValues = [];
-        // @todo After flush, retrieve the newly affected original values
+
+        /** @var EntityManager $em */
+        $em = $args->getObjectManager();
+
+        foreach ($em->getUnitOfWork()->getIdentityMap() as $class => $entities) {
+            $meta = $em->getClassMetadata($class);
+
+            foreach ($entities as $entity) {
+
+                foreach ($meta->fieldMappings as $name => $field) {
+
+                    $useDbValue = $field->options['detectChangeByDatabaseValue'] ?? false;
+
+                    if (!$useDbValue) {
+                        continue;
+                    }
+
+                    $oid = spl_object_id($entity);
+
+                    $type = Type::getType($field->type);
+
+                    $originalPHPValue = $meta->getFieldValue($entity, $name);
+
+                    $originalDBValue = $type->convertToDatabaseValue(
+                        $originalPHPValue,
+                        $em->getConnection()->getDatabasePlatform()
+                    );
+
+                    $this->originalValues[$oid][$name] = [
+                        'php' => $originalPHPValue,
+                        'db'  => $originalDBValue,
+                    ];
+                }
+            }
+        }
     }
 
     public function onClear(): void

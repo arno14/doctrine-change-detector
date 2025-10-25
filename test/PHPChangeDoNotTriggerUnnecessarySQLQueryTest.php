@@ -6,7 +6,7 @@ namespace Arno14\DoctrineChangeDetector\Tests;
 
 use Arno14\DoctrineChangeDetector\Tests\Entity\TestEntity;
 
-class NoAdditionalQueryTest extends AbstractTestCase
+class PHPChangeDoNotTriggerUnnecessarySQLQueryTest extends AbstractTestCase
 {
     public function testNoAdditionalQueryOnUnchangedDataTest(): void
     {
@@ -47,8 +47,8 @@ class NoAdditionalQueryTest extends AbstractTestCase
         // Flush again without real  changes
         $entity->dateByValue = new \DateTime('2000-01-01');
         $this->entityManager->flush();
-        $this->markTestIncomplete('Needs fix');
-        // @phpstan-ignore-next-line
-        $this->assertCountQueries(1);
+        $this->assertCountQueries(0)
+             ->assertDBValue('2000-01-01', $entity->id)
+        ;
     }
 }

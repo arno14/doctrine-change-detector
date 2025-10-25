@@ -7,13 +7,13 @@ namespace Arno14\DoctrineChangeDetector\Tests;
 
 use Arno14\DoctrineChangeDetector\Tests\Entity\TestEntity;
 
-class ChangeComputedByDBValueTest extends AbstractTestCase
+class ChangeAreComputedByDBValueTest extends AbstractTestCase
 {
-    public function testChangeDetectedOnDatabaseComputedValue(): void
+    public function testEntityRetrievedFromManagerHasValueComputedByDBValue(): void
     {
         // Initial state
         $this->insert(['id' => 111, 'date_by_value' => '2000-01-01'])
-                ->resetCountQueries();
+             ->resetCountQueries();
 
         $entity = $this->entityManager->find(Entity\TestEntity::class, 111);
         $this->assertInstanceOf(TestEntity::class, $entity);
@@ -29,12 +29,31 @@ class ChangeComputedByDBValueTest extends AbstractTestCase
             ->resetCountQueries();
 
         //set back the datetime object to original date
-        $this->markTestIncomplete('Needs fix');
-        // @phpstan-ignore-next-line
         $entity->dateByValue->modify('-1 day');
         $this->entityManager->flush();
         $this->assertCountQueries(1)
             ->assertDBValue('2000-01-01', $entity->id, 'date_by_value')
+            ->resetCountQueries();
+    }
+
+    public function testEntityNewlyCreatedHasValueComputedByDBValue(): void
+    {
+        $this->resetCountQueries();
+
+        $entity = new TestEntity();
+        $entity->dateByValue = new \DateTime('2000-01-01');
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush();
+
+        $this->assertCountQueries(1)
+            ->assertDBValue('2000-01-01', $entity->id, 'date_by_value')
+            ->resetCountQueries();
+
+        //change the datetime object value
+        $entity->dateByValue->modify('+1 day');
+        $this->entityManager->flush();
+        $this->assertCountQueries(1)
+            ->assertDBValue('2000-01-02', $entity->id, 'date_by_value')
             ->resetCountQueries();
     }
 }
