@@ -21,14 +21,14 @@ class ChangeAreComputedByDBValueTest extends AbstractTestCase
         $this->assertCountQueries(1)
             ->resetCountQueries();
 
-        //change the datetime object value
+        // change the datetime object value
         $entity->dateByValue->modify('+1 day');
         $this->entityManager->flush();
         $this->assertCountQueries(1)
             ->assertDBValue('2000-01-02', $entity->id, 'date_by_value')
             ->resetCountQueries();
 
-        //set back the datetime object to original date
+        // set back the datetime object to original date
         $entity->dateByValue->modify('-1 day');
         $this->entityManager->flush();
         $this->assertCountQueries(1)
@@ -49,7 +49,7 @@ class ChangeAreComputedByDBValueTest extends AbstractTestCase
             ->assertDBValue('2000-01-01', $entity->id, 'date_by_value')
             ->resetCountQueries();
 
-        //change the datetime object value
+        // change the datetime object value
         $entity->dateByValue->modify('+1 day');
         $this->entityManager->flush();
         $this->assertCountQueries(1)

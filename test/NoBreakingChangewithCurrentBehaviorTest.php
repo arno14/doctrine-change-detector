@@ -28,7 +28,7 @@ class NoBreakingChangewithCurrentBehaviorTest extends AbstractTestCase
         // Update with same value
         $entity->dateByRef = new \DateTime('2000-01-01');
         $this->entityManager->flush();
-        $this->assertCountQueries(1)// this trigger SQL query but this one is unusefull
+        $this->assertCountQueries(1)// this trigger SQL query but they are in fact unusefull
             ->assertDBValue('2000-01-01', $entity->id, 'date_by_ref')
             ->resetCountQueries();
 
@@ -56,7 +56,7 @@ class NoBreakingChangewithCurrentBehaviorTest extends AbstractTestCase
         // Modify the DateTime object without changing its value, which is not supported by Doctrine ORM currently
         $entity->dateByRef->modify('+1 day');
         $this->entityManager->flush();
-        $this->assertCountQueries(0)
+        $this->assertCountQueries(0)// this does not trigger change detection
             ->assertDBValue('2020-01-01', $entity->id, 'date_by_ref')//DB value is unchanged
             ->resetCountQueries();
     }
