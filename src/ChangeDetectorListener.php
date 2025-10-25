@@ -131,7 +131,7 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
         $em = $args->getObjectManager();
 
         foreach ($em->getUnitOfWork()->getIdentityMap() as $className => $entities) {
-            
+
             if ($this->isClassNotConcerned($className)) {
                 continue;
             }
@@ -161,8 +161,8 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
         EntityManager $em,
         ?ClassMetadata $classMetadata = null
     ): void {
-        $classMetadata = (null === $classMetadata) ? $em->getClassMetadata(get_class($entity)) : $classMetadata;
 
+        $classMetadata = (null === $classMetadata) ? $em->getClassMetadata(get_class($entity)) : $classMetadata;
 
         foreach ($this->iterateConcernedMapping($classMetadata) as $name => $field) {
 
@@ -201,7 +201,9 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
         }
 
         if (isset($this->classNameConcerned[$classMetadata->name])) {
+
             foreach ($this->classNameConcerned[$classMetadata->name] as $fieldName) {
+
                 yield $fieldName => $classMetadata->fieldMappings[$fieldName];
             }
             return;
@@ -214,6 +216,7 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
             $useDbValue = $fieldMapping->options[self::OPTION_NAME] ?? false;
 
             if (!$useDbValue) {
+
                 continue;
             }
 
@@ -223,8 +226,11 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
         }
 
         if (count($concernedFields) > 0) {
+
             $this->classNameConcerned[$classMetadata->name] = $concernedFields;
+
         } else {
+
             $this->classNameNotConcerned[$classMetadata->name] = true;
         }
     }
