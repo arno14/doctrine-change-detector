@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Arno14\DoctrineChangeDetector\Tests\Utils;
 
 use Arno14\DoctrineChangeDetector\ChangeDetectorListener;
+use ArrayObject;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
@@ -24,13 +25,13 @@ use PSpell\Config;
 
 class LoggingConnection implements DriverConnection
 {
-    private DriverConnection $inner;
-    private \ArrayObject $queries;
-
-    public function __construct(DriverConnection $inner, \ArrayObject $queries)
-    {
-        $this->inner = $inner;
-        $this->queries = $queries;
+    /**
+     * @param ArrayObject<int,string> $queries
+     */
+    public function __construct(
+        private DriverConnection $inner,
+        private ArrayObject $queries
+    ) {
     }
 
     public function getServerVersion(): string
@@ -61,9 +62,9 @@ class LoggingConnection implements DriverConnection
         return $this->inner->exec($sql);
     }
 
-    public function lastInsertId(?string $name = null): string
+    public function lastInsertId(): string
     {
-        return $this->inner->lastInsertId($name);
+        return $this->inner->lastInsertId();
     }
 
     public function beginTransaction(): void

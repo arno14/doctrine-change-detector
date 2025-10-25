@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
 {
     /**
-     * @var array<string, array<string,array<string,array{php:mixed,db:mixed}>>
+     * @var array<int,array<string,array{php:mixed,db:mixed}>>
      */
     private array $originalValues = [];
 

@@ -23,6 +23,6 @@
     },
     "scripts": {
         "test": "vendor/bin/phpunit test",
-        "fix": "vendor/bin/php-cs-fixer fix src && vendor/bin/php-cs-fixer fix test && vendor/bin/phpstan analyse src && vendor/bin/phpstan analyse test"
+        "fix": "vendor/bin/php-cs-fixer fix src && vendor/bin/php-cs-fixer fix test && vendor/bin/phpstan analyse --level=6 src && vendor/bin/phpstan analyse --level=6  test"
     }
 }
