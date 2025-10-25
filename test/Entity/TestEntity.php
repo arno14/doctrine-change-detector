@@ -15,10 +15,10 @@ class TestEntity
     #[ORM\GeneratedValue]
     public ?int $id = null;
 
-    #[ORM\Column(type: 'date', nullable:true)]
+    #[ORM\Column(type: 'date', nullable:true, name: 'date_by_ref')]
     public ?\DateTime $dateByRef = null;
 
-    #[ORM\Column(type: 'date', nullable:true, options:['detectChangeByDatabaseValue' => true])]
+    #[ORM\Column(type: 'date', nullable:true, name: 'date_by_value', options:['detectChangeByDatabaseValue' => true], )]
     public ?\DateTime $dateByValue = null;
 
 }

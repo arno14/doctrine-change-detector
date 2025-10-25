@@ -18,26 +18,36 @@ class NoBCwithCurrentBehaviorTest extends AbstractTestCase
         $entity->dateByRef = new \DateTime('2000-01-01');
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
-        $this->assertCountQueries(1);
+        $this->assertCountQueries(1)
+            ->assertDBValue('2000-01-01', $entity->id, 'date_by_ref')
+            ->resetCountQueries();
 
         // Update with same value
         $entity->dateByRef = new \DateTime('2000-01-01');
         $this->entityManager->flush();
-        $this->assertCountQueries(2);
+        $this->assertCountQueries(1)
+            ->assertDBValue('2000-01-01', $entity->id, 'date_by_ref')
+            ->resetCountQueries();
 
         // Update with different value
         $entity->dateByRef = new \DateTime('2020-01-01');
         $this->entityManager->flush();
-        $this->assertCountQueries(3);
+        $this->assertCountQueries(1)
+            ->assertDBValue('2020-01-01', $entity->id, 'date_by_ref')
+            ->resetCountQueries();
 
         // Clear and reload entity
         $this->entityManager->clear();
         $entity = $this->entityManager->find(TestEntity::class, $entity->id);
-        $this->assertCountQueries(4);
+        $this->assertCountQueries(1)
+            ->assertDBValue('2020-01-01', $entity->id, 'date_by_ref')
+            ->resetCountQueries();
 
         // Update with same value after reload
         $entity->dateByRef = new \DateTime('2020-01-01');
         $this->entityManager->flush();
-        $this->assertCountQueries(5);
+        $this->assertCountQueries(1)
+            ->assertDBValue('2020-01-01', $entity->id, 'date_by_ref')
+            ->resetCountQueries();
     }
 }

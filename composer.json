@@ -9,7 +9,9 @@
         "phpunit/phpunit": "^12.4",
         "symfony/cache": "^7.3",
         "php-cs-fixer/shim": "^3.89",
-        "phpstan/phpstan": "^2.1"
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/extension-installer": "^1.4"
     },
     "autoload": {
         "psr-4": {
@@ -24,5 +26,10 @@
     "scripts": {
         "test": "vendor/bin/phpunit test",
         "fix": "vendor/bin/php-cs-fixer fix src && vendor/bin/php-cs-fixer fix test && vendor/bin/phpstan analyse --level=6 src && vendor/bin/phpstan analyse --level=6  test"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
     }
 }
