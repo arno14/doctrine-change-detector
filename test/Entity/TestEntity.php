@@ -7,6 +7,7 @@ namespace Arno14\DoctrineChangeDetector\Tests\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
+#[ORM\Table(name: 'test_entity')]
 class TestEntity
 {
     #[ORM\Id]
@@ -14,6 +15,10 @@ class TestEntity
     #[ORM\GeneratedValue]
     public ?int $id = null;
 
-    #[ORM\Column(type: 'date', options:['detectChangeByDatabaseValue' => true])]
-    public ?\DateTime $birthDay = null;
+    #[ORM\Column(type: 'date', nullable:true)]
+    public ?\DateTime $dateByRef = null;
+
+    #[ORM\Column(type: 'date', nullable:true, options:['detectChangeByDatabaseValue' => true])]
+    public ?\DateTime $dateByValue = null;
+
 }

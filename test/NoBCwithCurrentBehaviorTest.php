@@ -6,37 +6,38 @@ namespace Arno14\DoctrineChangeDetector\Tests;
 
 use Arno14\DoctrineChangeDetector\Tests\Entity\TestEntity;
 
-class ChangeDetectorListenerTest extends AbstractTestCase
+class NoBCwithCurrentBehaviorTest extends AbstractTestCase
 {
-    public function testSecondFlushDoesNotTriggerQueries(): void
+    public function testNoChangeOnMappedFieldWithoutOption(): void
     {
         // Initial state
         $this->resetCountQueries();
 
         // Create and persist entity
         $entity = new TestEntity();
-        $entity->birthDay = new \DateTime('2000-01-01');
+        $entity->dateByRef = new \DateTime('2000-01-01');
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
         $this->assertCountQueries(1);
 
         // Update with same value
-        $this->resetCountQueries();
-        $entity->birthDay = new \DateTime('2000-01-01');
+        $entity->dateByRef = new \DateTime('2000-01-01');
         $this->entityManager->flush();
-        $this->assertCountQueries(1);
-        //@todo change this, we expect zero queries as the value is the same
+        $this->assertCountQueries(2);
+
+        // Update with different value
+        $entity->dateByRef = new \DateTime('2020-01-01');
+        $this->entityManager->flush();
+        $this->assertCountQueries(3);
 
         // Clear and reload entity
-        $this->resetCountQueries();
         $this->entityManager->clear();
         $entity = $this->entityManager->find(TestEntity::class, $entity->id);
-        $this->assertCountQueries(1);
+        $this->assertCountQueries(4);
 
         // Update with same value after reload
-        $this->resetCountQueries();
-        $entity->birthDay = new \DateTime('2000-01-01');
+        $entity->dateByRef = new \DateTime('2020-01-01');
         $this->entityManager->flush();
-        $this->assertCountQueries(0);
+        $this->assertCountQueries(5);
     }
 }
