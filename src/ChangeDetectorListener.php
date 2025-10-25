@@ -29,7 +29,7 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
     private array $classNameConcerned = [];
 
     /**
-     * For optimization purposes,store the names of classes not having any field with the option detectChangeByDatabaseValue set to true
+     * For optimization purposes, store the names of classes not having any field with the option detectChangeByDatabaseValue set to true
      * @var array<string,true>
      */
     private array $classNameNotConcerned = [];
@@ -49,6 +49,7 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
         $entity = $args->getObject();
 
         if ($this->isClassNotConcerned(get_class($entity))) {
+
             return;
         }
 
@@ -66,6 +67,7 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
         foreach ($em->getUnitOfWork()->getIdentityMap() as $className => $entities) {
 
             if ($this->isClassNotConcerned($className)) {
+
                 continue;
             }
 
@@ -77,6 +79,7 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
                 $oid = spl_object_id($entity);
 
                 if (!isset($this->originalValues[$oid])) {
+
                     continue;
                 }
 
@@ -98,19 +101,20 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
                     );
 
                     if ($currentDBValue === $originalDBValue) {
-                        // No change detected, revert to original php value
+                        // DB values are unchanged
+                        // revert to original PHP value to avoid unnecessary SQL query if php values are not the same object instance
                         $classMetaData->setFieldValue($entity, $fieldName, $originalPHPValue);
                         continue;
                     }
 
-                    // DB values are different
                     if ($originalPHPValue !== $currentPHPValue) {
-                        // PHP values are also different, so UnitOfWork will detect the change
+                        // DB values are different and  PHP values are also different (different instance)
+                        // so UnitOfWork will detect the change and all is OK
                         continue;
                     }
-
-                    // PHP values are the same so UnitOfWork would not detect any change
-                    // The update will be forced by recreating a new instance of the PHP value and setting it to the entity
+                    // DB Values are different but PHP values are the same object instance
+                    // so UnitOfWork would not detect any change
+                    // The update in the UOW will be forced by recreating a new instance of the PHP value and applying it to the entity
                     $recreatedPHPValue = $type->convertToPHPValue(
                         $currentDBValue,
                         $em->getConnection()->getDatabasePlatform()
@@ -182,7 +186,6 @@ class ChangeDetectorListener implements \Doctrine\Common\EventSubscriber
                 'db'  => $originalDBValue,
             ];
         }
-
     }
 
     private function isClassNotConcerned(string $className): bool
